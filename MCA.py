@@ -1,19 +1,24 @@
-__author__ = 'laurensversluis'
+# Customize this starter script by adding code
+# to the run_script function. See the Help for
+# complete information on how to create a script
+# and use Script Runner.
 
-##Network=vector
-##Origins=point
-##Radius=number 2000
-##Results=output vector
+""" Your Description of the script goes here """
 
-import qgis
-import networkx as nx
+# Some commonly used imports
 
-g = nx.read_shp('vector')
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from qgis.core import *
+from qgis.gui import *
 
-n = node
-r = radius
 
-nx.ego_graph(g,n,r,True,False,None)
+def run_script(iface):
+    """ Put your code here and remove the pass statement"""
+    layer = iface.mapCanvas().currentLayer()
+    for f in layer.getFeatures()
+        f.geometry()
+    print layer.featureCount()
 
 
 
