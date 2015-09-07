@@ -1,0 +1,11 @@
+import xml.etree.cElementTree as et
+
+tree = et.parse('/Users/laurensversluis/Desktop/test.xml')
+
+root = tree.getroot()
+
+def printer():
+    for child in root:
+        print child.tag, child.attrib
+
+printer()
