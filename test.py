@@ -4,34 +4,26 @@ from qgis import *
 import networkx as nx
 
 
-def run_script(iface):
 
-    layer = iface.mapCanvas().currentLayer()
+G = nx.read_shp("/Users/laurensversluis/Google Drive/PyQGIS/Project/SSx_Toolkit/Data/Lines.shp",simplify=True)
 
-    if not layer.isValid():
-        print 'Layer is not valid!'
-        break
+network = nx.Graph()
 
-    else:
+for e in G.edges_iter():
 
-        G = nx.read_shp(layer)
+    e1 = e[0]
+    e2 = e[1]
 
-        network = nx.Graph()
+    p1 = QgsGeometry.fromPoint(QgsPoint(e1[0],e1[1]))
+    p2 = QgsGeometry.fromPoint(QgsPoint(e2[0],e2[1]))
 
-        for e in G.edges_iter():
+    d = QgsDistanceArea()
+    d.setEllipsoidalMode(True)
+    weight = d.measureLine(p1.asPoint(),p2.asPoint())
+    print weight
+    network.add_edge(e1,e2,weight=weight)
 
-            e1 = e[0]
-            e2 = e[1]
+for e in network.edges_iter():
 
-            p1 = QgsGeometry.fromPoint(QgsPoint(e1[0],e1[1]))
-            p2 = QgsGeometry.fromPoint(QgsPoint(e2[0],e2[1]))
+    print nx.single_source_dijkstra_path_length(G,e[0],cutoff=None,weight='weight')
 
-            d = QgsDistanceArea()
-            d.setEllipsoidalMode(True)
-            weight = d.measureLine(p1.asPoint(),p2.asPoint())
-            print weight
-            network.add_edge(e1,e2,weight='weight')
-
-        for e in network.edges_iter():
-
-            print nx.single_source_dijkstra_path_length(G,e[0],cutoff=None,weight='weight')
