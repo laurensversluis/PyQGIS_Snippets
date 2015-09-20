@@ -1,24 +1,37 @@
-# Customize this starter script by adding code
-# to the run_script function. See the Help for
-# complete information on how to create a script
-# and use Script Runner.
-
-""" Your Description of the script goes here """
-
-# Some commonly used imports
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
-from qgis.gui import *
+from qgis import *
+import networkx as nx
+
+""" Open network layer """
+
+def run_script():
+
+    nlayer = iface.activeLayer()
+    iter = nlayer.getFeatures()
+    G = nx.Graph()
+
+    for f in iter:
+        geom = f.geometry()
+        if geom.wkbType() != QGis.WKBLineString:
+            print "This is not a line layer."
+
+        d = QgsDistanceArea()
+        d.setEllipsoidalMode(True)
+
+        weight = d.measureLine(geom.asPolyline())
+        id= f.id()+1
+
+        print id, '',weight
+
+        p1 = geom.asPolyline()[0]
+
+        p2 = geom.asPolyline()[1]
+        print p1,p2
+        G.add_edge(p1,p2,weight='weight')
 
 
-def run_script(iface):
-    """ Put your code here and remove the pass statement"""
-    layer = iface.mapCanvas().currentLayer()
-    for f in layer.getFeatures()
-        f.geometry()
-    print layer.featureCount()
+#check if layer contains lines
 
 
-
+run_script()
