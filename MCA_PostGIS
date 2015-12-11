@@ -1,0 +1,62 @@
+# Loading dependencies
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+from qgis.core import *
+from qgis.gui import *
+
+import psycopg2
+from psycopg2.extensions import AsIs
+
+# Data sources
+database = "project"
+topology = "topology"
+schema = "2044"
+network = "ax_ex_topo"
+origins = "transport_dlr"
+
+topo_table = topology + '.' + network
+origin_table = ""2044".transport_dlr"
+origin_column = "station"
+schema = 
+
+# Connect to an existing database
+print "Connecting to the database..."
+try:
+	conn = psycopg2.connect("dbname= 'project' user='postgres' host='192.168.1.9' port='8888' password='spaces01'");
+except:
+	print "Unable to connect"
+	
+# Open a cursor to perform database operations
+cur = conn.cursor()
+
+# Reading origin table
+print "Reading origin table..."
+sql_read = "SELECT %s FROM %s"
+cur.execute(sql_read, (AsIs(origin_table),AsIs(origin_table)))
+
+stations = cur.fetchall()
+
+# Creating a MCA table
+print "Creating MCA table..."
+sql_mca_table = "CREATE TABLE %s AS (SELECT * from  %s)"
+cur.execute(sql_read, (AsIs(origin_table),AsIs(origin_table)))
+
+stations = cur.fetchall()
+
+# Creating 
+#sql_1 = "CREATING TABLE %s ADD COLUMN %s INTEGER;"
+#name = "rnd073.poo"
+#columns = ('poo', 'pee', 'bob')
+#for i in columns:
+#	cur.execute(sql, (AsIs(name),AsIs(i),))
+
+
+
+
+# Make the changes to the database persistent
+conn.commit()
+
+# Close communication with the database
+cur.close()
+conn.close()
