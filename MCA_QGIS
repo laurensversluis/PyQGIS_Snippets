@@ -1,0 +1,99 @@
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+from qgis.core import *
+from qgis.gui import *
+from qgis.networkanalysis import *
+
+"""Defining radius"""
+radius = 300  
+
+"""Identifying the network and origins layers"""
+network = QgsVectorLayer("/Users/laurensversluis/Google Drive/PyQGIS/Project/SSx_Toolkit/Data/Lines.shp", "Network Layer", "ogr")
+origins = QgsVectorLayer("/Users/laurensversluis/Google Drive/PyQGIS/Project/SSx_Toolkit/Data/Origins.shp", "Origins Layer", "ogr")
+
+
+#origins = QgsPoint(-0.09957133486,51.56149395)
+
+# perform checks
+
+
+
+def catchment_analysis(network,origin, radius):
+    
+	"""Preparation"""
+	director = QgsLineVectorLayerDirector(network, -1, '', '', '', 3) # graph director to load the network and determine properties of the graph
+
+	properter = QgsDistanceArcProperter() # routing algorithm based on line length
+
+	director.addProperter(properter) # tell the director about the properter
+
+	crs = network.crs() # fetch projection from network 
+
+	builder = QgsGraphBuilder(crs) # make the graph from the network
+		
+	
+	"""Running the analysis"""
+
+	tiedPoints = director.makeGraph(builder, [origin]) # tie the origin into the network
+
+	tStart = tiedPoints[0] # define the origin as the starting point 
+
+	graph = builder.graph()
+
+	idStart = graph.findVertex(tStart) # locate the starting point in the graph
+
+	(tree, cost) = QgsGraphAnalyzer.dijkstra(graph, idStart, 0) # creating a tree around the origin with appropriate cost
+
+	innerBound = [] # list of tuples containing line id, arc id and cost
+
+	l = 0 # line counter	
+	
+	while l < len(cost):
+		print l
+		if cost[l] < radius and tree[l] != -1:
+			inVertex = graph.vertex(graph.arc(tree[l]).inVertex()).point()
+			outVertex = graph.vertex(graph.arc(tree[l]).outVertex()).point()
+			line = QgsGeometry.fromPolyline([inVertex, outVertex])
+			print line
+			
+			if cost[l] < radius:
+		
+				innerBound.append(l)
+		l = l + 1
+	
+	
+	
+	return innerBound, graph # exporting lines with costs to origin
+
+
+v_mca = QgsVectorLayer("Point", "mca", "memory")
+p_mca = v_mca.dataProvider()
+
+vp_mca = QgsVectorLayer("Polygon", "p_mca", "memory")
+pp_mca = v_mca.dataProvider()
+
+for i in origins.getFeatures():
+	p_mca.addAttributes([QgsField("%s" % i['name'],QVariant.String)])
+	v_mca.updateFields()
+	print "Analysis from: %s" % i['name']
+	geom = i.geometry()
+	origin = geom.asPoint()
+	lines, graph = catchment_analysis(network, origin, radius) 
+	print "Caught these lines: ", points
+	
+	polyline = []
+	
+	for p in points:
+		fet = QgsFeature()
+		point = graph.vertex(p).point()
+		fet.setGeometry(QgsGeometry.fromPoint(point))
+		p_mca.addFeatures([fet])
+		polypoint.append(point)
+		
+	pol = QgsFeature()
+	pol.setGeometry(QgsGeometry.fromPolygon([polypoint]))
+	pp_mca.addFeatures([pol])
+
+QgsMapLayerRegistry.instance().addMapLayer(v_mca)	
+QgsMapLayerRegistry.instance().addMapLayer(vp_mca)	
