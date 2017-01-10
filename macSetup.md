@@ -1,30 +1,4 @@
-# The Perfect Web Development Setup for OS X
-
-This is what I perceive as the perfect web development OS X setup.
-It makes web development a breeze.
-I've tried to use Ubuntu, but unfortunately it's just not as user friendly as OS X.
-I wish to make one for Ubuntu eventually once I figure it out.
-
-Note: this is all from memory and will be revised once I get a new Mac or reformat this one.
-Clarifications and PRs are welcomed.
-
-## Goals
-
-- Never use `sudo`. Once you run a command with `sudo`, future commands are probably gonna be fucked up as well.
-- Automatically start all services. Don't bother keeping track a bunch of terminals running processes.
-- Don't shoot yourself in the foot.
-
-## Environment Profile
-
-My current profile is `~/.bash_profile`.
-I don't know why OS X uses `~/.bash_profile`,
-but it may be different for you.
-Some lines you should add are:
-
-- `ulimit -n 10240` - bumps the maximum number of file descriptors you can have open on your computer.
-  There's no purpose for the default limit, especially on SSDs.
-- `export JOBS=max` - tells `npm` to compile and install all your native addons in parallel and not sequentially.
-  This greatly increases installation times.
+# Setup of OS X for web development
 
 ## XCode Command Line Tools
 
@@ -46,35 +20,64 @@ It makes setting up all your services very easy.
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-## Install everything
+### Software development programs
 
-Install everything with Homebrew.
-Here are some packages you might be interested in right now:
+The following packages install all the development tools you need.
 
 ```bash
-# for editing files
-brew install vim
-# always keep your git up to date by installing it with brew
+# ATOM for quickly editing code
+brew cask install ATOM
+# PyCharm as IDE for Python development
+brew install Caskroom/versions/pycharm-ce-eap
+# IntelliJ as IDE for Java development
+brew cask install intellij-idea-ce
+# DASH for documentation
+brew cask install DASH
+# GIT for performing git tasks using command line
 brew install git
-# download stuff
-brew install curl
-# docker on your mac
-brew install boot2docker
-# for your pr0n
-brew install youtube-dl
+# GIT-Desktop for doing the same in a gui
+brew cask install github-desktop
+# Music for during coding
+brew cask install spotify
+```
+
+### Database
+There are many different database systems out there. I find the open-source PostgreSQL one of the best. Although you can install PostgreSQL using Homebrew, the [PostgresApp](https://postgresapp.com) very handy for switching on and off the server. Just download the app and move it to the program folder.
+
+### QGIS environment
+QGIS requires the [Geospatial Data Abstraction Library (GDAL)](http://www.gdal.org) to be installed.
+
+```brew install gdal```
+
+You will need to install a new version of python. QGIS requires the Python language and some Python packages to be installed. Although macOS has a version of Python, unfortunately it doesn’t come with the Pip package manager, which makes it easy to install Python packages. I could have installed Pip using the easy_install tool that comes with the system Python, but this method requires using sudo. Sudo commands should be avoided.
+
+The Homebrew version of Python comes with Pip
+
+```brew install python```
+
+Installing Python with Homebrew gives us a version of Python that’s separate from the system Python, so any changes we make to the Homebrew version of Python won’t adversely affect macOS.
+
+QGIS requires a number of python packages that we can install with Pip.
+
+```bash
+# Matplotlib, the Python 2D plotting library
+pip install matplotlib
+# Psycopg2, a Python adapter for the PostgreSQL database
+PATH=$PATH:/Applications/Postgres.app/Contents/Versions/9.6/bin pip install psycopg2
+```
+At this stage, Python was installed and ready to go with the packages required by QGIS. QGIS is also installed with homebrew. I installed the latest Long Term Release which is the most stable version. In my case this was version 2.14. Also I have removed the installation of Grass and the QGISServer tools.
+
+```bash
+brew tap homebrew/science
+brew tap osgeo/osgeo4mac
+brew info qgis-xx # review options
+# Installing QGIS with grass 7 and without QGIS server
+brew install qgis2-ltr --without-grass --without-server
+# Install a program icon in programs
+brew linkapps qgis2-ltr
 ```
 
 ### Updating
-
-To update your packages,
-simply run:
-
-```bash
-brew update
-brew upgrade
-```
-
-Once in a while, I run `brew prune` and `brew doctor` to keep my computer in check.
 
 ## Install node.js with nvm
 
@@ -306,3 +309,15 @@ https://developers.google.com/speed/public-dns/docs/using?hl=en#mac_os
 - [Atom](https://atom.io/) - the best text editor :D
 - [Sublime Text](http://www.sublimetext.com/) - the second best text editor
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads) - for VMs, which can't be install using Homebrew
+
+## Maintenance
+
+To update your packages,
+simply run:
+
+```bash
+brew update
+brew upgrade
+```
+
+Once in a while, I run ```brew prune``` and ```brew doctor``` to keep my computer in check.
