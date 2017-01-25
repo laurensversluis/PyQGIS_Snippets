@@ -1,4 +1,4 @@
-# Setup of OS X for web development
+# Setup of OS X for GIS development
 
 ## XCode Command Line Tools
 
@@ -37,17 +37,34 @@ brew cask install DASH
 brew install git
 # GIT-Desktop for doing the same in a gui
 brew cask install github-desktop
+```
+
+### General programs
+
+```
 # Music for during coding
 brew cask install spotify
+# Google-drive for cloud storage
+brew cask install --appdir="/Applications" google-drive
+# Skype for conference calls
+brew cask install --appdir="/Applications" skype
+# Slack for project communication
+brew cask install --appdir="/Applications" slack
 ```
 
 ### Database
+
 There are many different database systems out there. I find the open-source PostgreSQL one of the best. Although you can install PostgreSQL using Homebrew, the [PostgresApp](https://postgresapp.com) very handy for switching on and off the server. Just download the app and move it to the program folder.
 
 ### QGIS environment
+
 QGIS requires the [Geospatial Data Abstraction Library (GDAL)](http://www.gdal.org) to be installed.
 
 ```brew install gdal```
+
+Installing X11, a windows platform QGIS needs.
+
+'''brew install Caskroom/cask/xquartz'''
 
 You will need to install a new version of python. QGIS requires the Python language and some Python packages to be installed. Although macOS has a version of Python, unfortunately it doesn’t come with the Pip package manager, which makes it easy to install Python packages. I could have installed Pip using the easy_install tool that comes with the system Python, but this method requires using sudo. Sudo commands should be avoided.
 
@@ -57,27 +74,37 @@ The Homebrew version of Python comes with Pip
 
 Installing Python with Homebrew gives us a version of Python that’s separate from the system Python, so any changes we make to the Homebrew version of Python won’t adversely affect macOS.
 
+It is important to setup the Python path with these dependencies for QGIS and export this path before teh QGIS build so that it can find it.
+
+```export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH```
+
 QGIS requires a number of python packages that we can install with Pip.
 
-```bash
-# Matplotlib, the Python 2D plotting library
-pip install matplotlib
-# Psycopg2, a Python adapter for the PostgreSQL database
+```pip install numpy scipy matplotlib processing```
+
+Psycopg2 is Python adapter for the PostgreSQL database. This should link to the Postgres App you already have installed.
+```
 PATH=$PATH:/Applications/Postgres.app/Contents/Versions/9.6/bin pip install psycopg2
 ```
+
 At this stage, Python was installed and ready to go with the packages required by QGIS. QGIS is also installed with homebrew. I installed the latest Long Term Release which is the most stable version. In my case this was version 2.14. Also I have removed the installation of Grass and the QGISServer tools.
 
 ```bash
-brew tap homebrew/science
 brew tap osgeo/osgeo4mac
-brew info qgis-xx # review options
-# Installing QGIS with grass 7 and without QGIS server
-brew install qgis2-ltr --without-grass --without-server
-# Install a program icon in programs
-brew linkapps qgis2-ltr
+brew install qgis2-ltr
 ```
 
-### Updating
+
+
+## Optional packages
+Other packages you can install
+
+```
+pip install networkx
+pip install pb_tool
+```
+
+
 
 ## Install node.js with nvm
 
